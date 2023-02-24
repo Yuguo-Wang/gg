@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}My profile{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  Hi {{ user }}!
+  <div>
+    <p>Username: {{user.username}}</p>
+    <p>First name: {{user.first_name}}</p>
+    <p>Last name: {{user.last_name}}</p>
+    <p>Email: {{user.email}}</p>
+    <p>Phone number: {{user.phone_number}}</p>
+    <p>
+      Driver: 
+      {% if user.is_driver %}
+        Yes
+      {% else %}
+        No
+      {% endif %}
+    </p>
+  </div>
+  <div>
+    {% if user.is_driver %}
+        <p>Congratulations! You are a driver!</p>
+        <p>Plate number: {{user.vehicle.plate_num}}</p>
+        <p>Vehicle type: {{user.vehicle.get_type_display}}</p>
+        <p>Vehicle capacity: {{user.vehicle.capacity}}</p>
+        <p>Special vehicle info: {{user.vehicle.special_vehicle_info}}</p>
+        {% if can_edit %}
+          <p><a href="{% url 'edit-vehicle-info' %}">Edit vehicle info</a></p>
+        {% else %}
+          You can edit your vehicle info after all the driving rides are completed! See 
+          <a href="{% url 'show-my-rides' 'driver' %}">Rides in progress</a>
+        {% endif %}
+    {% else %}
+        <p><a href="{% url 'driver-register' %}">Become a driver now!</a></p>
+    {% endif %}
+    <p><a href="{% url 'edit-profile' %}">Edit Profile</a></p>
+    <p><a href="{% url 'passwd-change' %}">Change Password</a></p>
+    <p><a href="{% url 'home' %}">Home</a></p>
+    <p><a href="{% url 'logout' %}">Log Out</a></p>
+  </div>
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a> |
+  <a href="{% url 'signup' %}">Sign Up</a>
+{% endif %}
+{% endblock %}

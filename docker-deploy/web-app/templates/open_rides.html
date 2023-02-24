@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Open rides{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  Hi {{ user.username }}!
+  {% if mode == 'share' and form %}
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input type="submit" value="Search">
+    </form>
+  {% endif %}
+  <h2>
+    {% if not form %}
+      Here are rides you can choose to 
+      {% if mode == 'share' %}
+        Share!
+      {% elif mode == 'drive' %}
+        Drive!
+      {% endif %}
+    {% endif %}
+  </h2>
+  {% for ride in rides %}
+    <div>
+      <p>Destination: {{ ride.destination }}  |  Arrival time: {{ ride.arrival_time}}</p>
+      
+      <a href="{% url 'view-ride' ride.pk mode share_ride_id back_url %}">View the detail</a> 
+    </div>
+    <p>---------------------------------------------------------------</p>
+  {% endfor %}
+  {% if not form and mode == 'share' %}
+    <p><a href="{% url 'open-rides-share' %}">Back to search</a></p>
+  {% endif %}
+  <p><a href="{% url 'home' %}">Home</a></p>
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a> 
+  <a href="{% url 'signup' %}">Sign Up</a>
+{% endif %}
+{% endblock %}

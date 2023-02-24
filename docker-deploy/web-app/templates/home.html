@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  Hi {{ user.username }}!
+  <p><a href="{% url 'account-prof' %}">View Profile</a></p>
+  <p><a href="{% url 'make-ride-request' %}">Request a ride</a></p>
+  <p>
+    {% if user.is_driver %}
+      <a href="{% url 'open-rides-drive' %}">Become the driver of a ride!</a></p>
+    {% endif %}
+  </p>
+  <p><a href="{% url 'open-rides-share' %}">Search for a sharing ride</a></p>
+  <p><a href="{% url 'show-my-rides' 'all' %}">Rides in progress</a></p>
+  <p><a href="{% url 'logout' %}">Log Out</a></p>
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a> |
+  <a href="{% url 'signup' %}">Sign Up</a>
+{% endif %}
+{% endblock %}

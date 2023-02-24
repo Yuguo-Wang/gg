@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}My rides{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  Hi {{ user.username }}!
+  <h2>Here are your rides!</h2>
+  <a href="{% url 'show-my-rides' 'all' %}">All my rides | </a>
+  <a href="{% url 'show-my-rides' 'owner' %}">Rides I requested | </a>
+  <a href="{% url 'show-my-rides' 'sharer' %}">Rides-As a sharer | </a>
+  {% if user.is_driver %}
+    <a href="{% url 'show-my-rides' 'driver' %}">Rides-As a driver</a>
+  {% endif %}
+  {% for ride in rides %}
+    <div>
+        <p>Destination: {{ ride.destination }}  |  Arrival time: {{ ride.arrival_time}}</p>
+        <p>
+            Your role: 
+            {% if ride.owner == user %}
+                Owner 
+            {% elif ride.driver == user %}
+                Driver 
+            {% else %}
+                Sharer 
+            {% endif %}
+        </p>
+        <a href="{% url 'view-ride' ride.pk 'owner' 0 'show-my-rides' %}">View the ride</a> 
+    </div>
+    <p>---------------------------------------------------------------</p>
+  {% endfor %}
+  <p><a href="{% url 'home' %}">Home</a></p>
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a> 
+  <a href="{% url 'signup' %}">Sign Up</a>
+{% endif %}
+{% endblock %}

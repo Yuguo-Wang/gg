@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Ride detail{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  Hi {{ user.username }}!
+  <h2>Ride details</h2>
+  <div>
+    <ul>
+      <li>Destination: {{ ride.destination }}</li>
+      <li>Arrival time: {{ ride.arrival_time }}</li>
+      <li>Number of passengers: {{ ride.number_of_passengers_sum }}</li>
+      <li>Shared: 
+        {% if ride.shared %}
+          Yes
+        {% else %}
+          No
+        {% endif %}
+      </li>
+      <li>Stauts: {{ ride.get_status_display }}</li>
+      <li>Special request: {{ ride.special_request }}</li>
+    </ul>
+      {% if role == 'Owner' %}
+        {% if ride.status == 'OPEN' %}
+          <a href="{% url 'edit-ride' ride.pk %}">Edit the ride</a> 
+        {% else %}
+          <p>You cannot edit the ride after it is confired by the driver!</p>
+        {% endif %}
+      {% elif role == 'Driver' %}
+        {% if ride.status == 'CONFIRMED' %}
+          <form action="{% url 'complete-ride' ride.pk %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Complete the ride">
+          </form>
+        {% endif %}
+      {% elif role == 'Sharer' %}
+        {% if ride.status == 'OPEN' %}
+          <form action="{% url 'quit-ride' ride.pk %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Quit the ride">
+          </form>
+        {% endif %}
+      {% else %}
+        {% if mode == 'share' %}
+          <form action="{% url 'share-ride' ride.pk share_ride_id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Join the ride">
+          </form>
+        {% endif %}
+        {% if mode == 'drive' %}
+          <form action="{% url 'drive-ride' ride.pk %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Start the ride">
+          </form>
+        {% endif %}
+      {% endif %}
+  </div>
+  <div>
+    {% if ride.status != 'OPEN' %}
+      <h4>Driver info:</h4>
+      <p>First name: {{ ride.driver.first_name }}</p>
+      <p>Last name: {{ ride.driver.last_name }}</p>
+      <h4>Vehicle info: </h4>
+      <p>Plate number: {{ ride.driver.vehicle.plate_num }}</p>
+      <p>Vehicle type: {{ ride.driver.vehicle.get_type_display }}</p>
+      <p>Capacity: {{ ride.driver.vehicle.capacity }}</p>
+      <p>Special vehicle info: {{ ride.driver.vehicle.special_vehicle_info }}</p>
+    {% endif %}
+  </div>
+  <div>
+    <h4>Passenger info:</h4>
+    <h5>Owner info:</h5>
+    <div>
+      <p>First name: {{ owner.first_name }}</p>
+      <p>Last name: {{ owner.last_name }}</p>
+      <p>Number of passengers: {{ ride.number_of_passengers }}</p>
+    </div>
+    <% if sharer_rides %>
+      <h5>Sharer info:</h5>
+      {% for sharer_ride in sharer_rides %}
+        <p>First name: {{ sharer_ride.owner.first_name }}</p>
+        <p>Last name: {{ sharer_ride.owner.last_name }}</p>
+        <p>Number of passengers: {{ sharer_ride.number_of_passengers }}</p>
+        <p>---------------------------------------------------------------</p>
+      {% endfor %}
+    {% endif %}
+  </div>
+  </div>
+  {% if back_url == 'show-my-rides' %}
+    <a href="{% url back_url 'all' %}">Back to list</a> 
+  {% else %}
+    <a href="{% url back_url %}">Back</a>
+  {% endif %}
+  
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a> 
+  <a href="{% url 'signup' %}">Sign Up</a>
+{% endif %}
+{% endblock %}

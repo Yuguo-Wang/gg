@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Edit vehicle info{% endblock %}
+
+{% block content %}
+<h2>Your vehicle</h2>
+<form method='post'>
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type='submit'>Submit</button>
+</form>
+<form action="{% url 'quit-driver' %}" method="post">
+  {% csrf_token %}
+  Don't want to be a driver?
+  <input type="submit" value="Quit">
+</form>
+{% endblock %}
